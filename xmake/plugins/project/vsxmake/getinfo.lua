@@ -366,12 +366,16 @@ function _make_filter(filepath, target, vcxprojdir)
                         filter = path.normalize(filegroup)
                     else
                         -- file tree mode (default)
-                        filter = path.normalize(path.join(filegroup, path.directory(fileitem)))
+                        if filegroup == "" then
+                            filter = path.normalize(path.directory(fileitem))
+                        else
+                            filter = path.normalize(path.join(filegroup, path.directory(fileitem)))
+                        end
                     end
                     if filter and filter == '.' then
                         filter = nil
                     end
-                    break
+                    return filter
                 end
             end
         end
