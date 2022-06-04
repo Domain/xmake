@@ -100,6 +100,6 @@ function _render(templatepath, opt, args)
 end
 
 function main(templatepath, pattern, cpattern, paramsprovider)
-    local opt = { pattern = pattern, cpattern, paramsprovider = paramsprovider, templatedir = path.directory(templatepath) }
+    local opt = { pattern = pattern, cpattern = cpattern, paramsprovider = paramsprovider, templatedir = path.directory(templatepath) }
     return _render(templatepath, opt, {})
 end
