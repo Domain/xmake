@@ -48,10 +48,10 @@ function _cfill(opt, params)
         tmp = cond:split("=")
         assert(#tmp == 2)
 
-        local k = tmp[1]
-        local v = tmp[2]
+        local k = tmp[1]:trim()
+        local v = tmp[2]:trim()
 
-        if opt:paramsprovider(k, params) == v then
+        if opt.paramsprovider(k, params) == v then
             return value1
         end
 
@@ -73,7 +73,7 @@ function _expand(params)
                 for i, p in ipairs(r) do
                     rcopy[i] = p .. "\0" .. c
                 end
-               newr = table.join(newr, rcopy)
+                newr = table.join(newr, rcopy)
             end
             r = newr
         end
@@ -84,19 +84,15 @@ function _expand(params)
     return r
 end
 
-function _render_template(template, opt, params)
+function _render(templatepath, opt, args)
+    local template = io.readfile(templatepath)
+    local params = _expand(opt.paramsprovider(args))
     local replaced = ""
     for _, v in ipairs(params) do
         local tmpl = template:gsub(opt.cpattern, _cfill(opt, v))
         replaced = replaced .. tmpl:gsub(opt.pattern, _fill(opt, v))
     end
     return replaced
-end
-
-function _render(templatepath, opt, args)
-    local template = io.readfile(templatepath)
-    local params = _expand(opt.paramsprovider(args))
-    return _render_template(template, opt, params)
 end
 
 function main(templatepath, pattern, cpattern, paramsprovider)
