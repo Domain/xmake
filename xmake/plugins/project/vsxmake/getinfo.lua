@@ -524,6 +524,7 @@ function main(outputdir, vsinfo)
 
                 -- save deps
                 _target.deps = table.unique(table.join(_target.deps or {}, table.keys(target:deps()), nil))
+                table.sort(_target.deps)
             end
         end
     end
@@ -557,6 +558,7 @@ function main(outputdir, vsinfo)
         end
         target._dirs = dirs
         target.dirs = table.keys(dirs)
+        table.sort(target.dirs)
         target._deps = {}
         for _, v in ipairs(target.deps) do
             target._deps[v] = targets[v]
@@ -582,5 +584,12 @@ function main(outputdir, vsinfo)
     end
     vsinfo.targets = targetnames
     vsinfo._targets = targets
+    table.sort(vsinfo.targets)
+    table.sort(vsinfo.modes)
+    if type(vsinfo.archs) == "table" then
+        table.sort(vsinfo.archs)
+    end
+    table.sort(vsinfo.groups)
+    table.sort(vsinfo.group_deps)
     return vsinfo
 end
