@@ -2,6 +2,18 @@
 
 ## master (unreleased)
 
+### Changes
+
+* Improve tools.cmake to support wasm
+* [#2491](https://github.com/xmake-io/xmake/issues/2491): Fallback to local compiler/cache from remote if server is unreachable
+
+### Bugs fixed
+
+* [#2488](https://github.com/xmake-io/xmake/issues/2488): Fix remote compilation from windows to linux
+* Fix cache-induced path conflicts in preprocessed files
+
+## v2.6.8
+
 ### New features
 
 * [#2447](https://github.com/xmake-io/xmake/pull/2447): Add qt.qmlplugin rule and support of qmltypesregistrar
@@ -1311,6 +1323,18 @@
 # 更新日志
 
 ## master (开发中)
+
+### 改进
+
+* 改进 tools.cmake 支持 wasm 库构建
+* [#2491](https://github.com/xmake-io/xmake/issues/2491): 如果服务器不可访问，自动回退到本地编译和缓存
+
+### Bugs 修复
+
+* [#2488](https://github.com/xmake-io/xmake/issues/2488): 修复从 windows 到 linux 的远程编译路径问题
+* 修复缓存导致的预处理文件路径冲突问题
+
+## v2.6.8
 
 ### 新特性
 

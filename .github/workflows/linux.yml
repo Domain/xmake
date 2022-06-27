@@ -47,6 +47,17 @@ jobs:
           path: artifacts/xmake.deb
 
       - name: Publish
+        if: github.ref == 'refs/heads/master'
+        uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: artifacts/xmake.deb
+          asset_name: xmake-${{ env.GITHUB_REF_SLUG }}.amd64.deb
+          asset_content_type: application/zip
+
+      - name: Publish
         if: github.event.action == 'published'
         uses: actions/upload-release-asset@v1.0.1
         env:
