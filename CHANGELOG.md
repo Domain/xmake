@@ -5,15 +5,20 @@
 ### New features
 
 * [#2474](https://github.com/xmake-io/xmake/issues/2474): Add icx and dpcpp toolchains
+* [#2523](https://github.com/xmake-io/xmake/issues/2523): Improve LTO support
+* [#2527](https://github.com/xmake-io/xmake/issues/2527): Add set_runargs api
 
 ### Changes
 
 * Improve tools.cmake to support wasm
 * [#2491](https://github.com/xmake-io/xmake/issues/2491): Fallback to local compiler/cache from remote if server is unreachable
+* [#2514](https://github.com/xmake-io/xmake/issues/2514): Disable Unity Build for project generator
+* [#2473](https://github.com/xmake-io/xmake/issues/2473): Improve apt::find_package to find it from pc files
 
 ### Bugs fixed
 
 * [#2488](https://github.com/xmake-io/xmake/issues/2488): Fix remote compilation from windows to linux
+* [#2504](https://github.com/xmake-io/xmake/issues/2504): Fix remote build bug on msys2/cygwin
 * Fix cache-induced path conflicts in preprocessed files
 
 ## v2.6.8
@@ -1331,15 +1336,20 @@
 ### 新特性
 
 * [#2474](https://github.com/xmake-io/xmake/issues/2474): 添加 icx 和 dpcpp 工具链
+* [#2523](https://github.com/xmake-io/xmake/issues/2523): 改进对 LTO 的支持
+* [#2527](https://github.com/xmake-io/xmake/issues/2527): 添加 set_runargs 接口
 
 ### 改进
 
 * 改进 tools.cmake 支持 wasm 库构建
 * [#2491](https://github.com/xmake-io/xmake/issues/2491): 如果服务器不可访问，自动回退到本地编译和缓存
+* [#2514](https://github.com/xmake-io/xmake/issues/2514): 为工程生成器禁用 Unity Build
+* [#2473](https://github.com/xmake-io/xmake/issues/2473): 改进 apt::find_package，支持从 pc 文件中查找
 
 ### Bugs 修复
 
 * [#2488](https://github.com/xmake-io/xmake/issues/2488): 修复从 windows 到 linux 的远程编译路径问题
+* [#2504](https://github.com/xmake-io/xmake/issues/2504): 修复在 msys2 上远程编译失败问题
 * 修复缓存导致的预处理文件路径冲突问题
 
 ## v2.6.8

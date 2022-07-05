@@ -90,7 +90,6 @@ end
 
 -- make the symbol flag
 function nf_symbol(self, level)
-    -- only for source kind
     local kind = self:kind()
     if language.sourcekinds()[kind] then
         local maps = _g.symbol_maps
@@ -105,6 +104,12 @@ function nf_symbol(self, level)
             _g.symbol_maps = maps
         end
         return maps[level .. '_' .. kind] or maps[level]
+    elseif kind == "ld" or kind == "sh" then
+        -- we need add `-g` to linker to generate pdb symbol file for mingw-gcc, llvm-clang on windows
+        local plat = self:plat()
+        if level == "debug" and (plat == "windows" or (plat == "mingw" and is_host("windows"))) then
+            return "-g"
+        end
     end
 end
 
@@ -391,6 +396,11 @@ function _has_color_diagnostics(self)
     return colors_diagnostics
 end
 
+-- get preprocess file path
+function _get_cppfile(sourcefile, objectfile)
+    return path.join(path.directory(objectfile), "__cpp_" .. path.basename(objectfile) .. path.extension(sourcefile))
+end
+
 -- do preprocess
 function _preprocess(program, argv, opt)
 
@@ -481,7 +491,7 @@ function _preprocess(program, argv, opt)
     end
 
     -- do preprocess
-    local cppfile = path.join(path.directory(objectfile), "__cpp_" .. path.basename(objectfile) .. path.extension(sourcefile))
+    local cppfile = _get_cppfile(sourcefile, objectfile)
     local cppfiledir = path.directory(cppfile)
     if not os.isdir(cppfiledir) then
         os.mkdir(cppfiledir)
@@ -630,6 +640,10 @@ function compile(self, sourcefile, objectfile, dependinfo, flags)
 
                 -- try removing the old object file for forcing to rebuild this source file
                 os.tryrm(objectfile)
+
+                -- remove preprocess file
+                local cppfile = _get_cppfile(sourcefile, objectfile)
+                os.tryrm(cppfile)
 
                 -- parse and strip errors
                 local lines = errors and tostring(errors):split('\n', {plain = true}) or {}
