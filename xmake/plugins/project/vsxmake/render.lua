@@ -34,104 +34,29 @@ end
 
 function _cfill(opt, params)
     return function(match)
-        local tmp = match:split(";", {strict = true, plain = true})
+        local tmp = match:split(";", {strict = true})
         assert(#tmp == 2 or #tmp == 3)
 
         local cond = tmp[1]
         local value1 = tmp[2]
         local value2 = ""
-        local len = false
-   
+        
         if #tmp == 3 then
             value2 = tmp[3]
         end
 
-        local ops = { "==", "~=", "<=", ">=", "<", ">", "=" }
-        local op = nil
-        local k = nil
-        local v = nil
+        tmp = cond:split("=")
+        assert(#tmp == 2)
 
-        for _, o in ipairs(ops) do
-            local i, j = cond:find(o)
-            if i ~= nil then
-                op = o
-                k = cond:sub(1, i - 1):trim()
-                v = cond:sub(j + 1):trim()
-                break
-            end
-        end
+        local k = tmp[1]:trim()
+        local v = tmp[2]:trim()
 
-        assert(op)
-        assert(k)
-        assert(v)
-        
-        if k:startswith("#") then
-            k = k:sub(2)
-            len = true
-        end
-
-        local m = k:split(".", { plain = true })
-        local p
-
-        local old_target = opt.paramsprovider() or ""
-
-        for i,item in ipairs(m) do
-            if i == 1 then
-                p = opt.paramsprovider(item, params)
-                if item == "target" then
-                    opt.paramsprovider(p)
-                end
-            else
-                p = _expand(opt.paramsprovider({item}))
-            end
-        end
-
-        if _cmp(p, v, op, len) then
+        if opt.paramsprovider(k, params) == v then
             return value1
-        end
-
-        if old_target ~= opt.paramsprovider() then
-            opt.paramsprovider(old_target)
         end
 
         return value2
     end
-end
-
-function _cmp(lhs, rhs, op, len)
-    if len then
-        lhs = #lhs
-    end
-
-    if type(lhs) == "number" then
-        rhs = tonumber(rhs)
-    end
-
-    if op == "==" or op == "=" then
-        return lhs == rhs
-    end
-
-    if op == "~=" then
-        return lhs ~= rhs
-    end
-
-    if op == "<=" then
-        return lhs <= rhs
-    end
-
-    if op == ">=" then
-        return lhs >= rhs
-    end
-
-    if op == "<" then
-        return lhs < rhs
-    end
-
-    if op == ">" then
-        return lhs > rhs
-    end
-
-    raise("unknown operator '" .. op .. "'")
 end
 
 function _expand(params)
@@ -159,8 +84,6 @@ function _expand(params)
     return r
 end
 
-local save_target
-
 function _render(templatepath, opt, args)
     local template = io.readfile(templatepath)
     local params = _expand(opt.paramsprovider(args))
@@ -169,16 +92,10 @@ function _render(templatepath, opt, args)
         local tmpl = template:gsub(opt.cpattern, _cfill(opt, v))
         replaced = replaced .. tmpl:gsub(opt.pattern, _fill(opt, v))
     end
-
-    if save_target ~= opt.paramsprovider() then
-        opt.paramsprovider(save_target)
-    end
-
     return replaced
 end
 
 function main(templatepath, pattern, cpattern, paramsprovider)
     local opt = { pattern = pattern, cpattern = cpattern, paramsprovider = paramsprovider, templatedir = path.directory(templatepath) }
-    save_target = paramsprovider() or ""
     return _render(templatepath, opt, {})
 end
