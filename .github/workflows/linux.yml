@@ -46,6 +46,10 @@ jobs:
           name: xmake-latest.amd64.deb
           path: artifacts/xmake.deb
 
+      - name: Get Previous tag
+        id: previoustag
+        uses: WyriHaximus/github-action-get-previous-tag@master
+
       - name: Upload artifacts to lastest release
         if: github.ref == 'refs/heads/master'
         uses: svenstaro/upload-release-action@v2
