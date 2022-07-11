@@ -307,7 +307,7 @@ function _fetch_packages(packages_fetch, installdeps)
                 end
             end
             if instance == nil and #packages_pending > 0 then
-                scheduler.co_yield()
+                os.sleep(100)
             end
         end
         if instance then
@@ -321,7 +321,7 @@ function _fetch_packages(packages_fetch, installdeps)
             end
             if not parallelize then
                 while fetching_count > 0 do
-                    scheduler.co_yield()
+                    os.sleep(100)
                 end
             end
             fetching_count = fetching_count + 1
@@ -355,6 +355,17 @@ function _fetch_packages(packages_fetch, installdeps)
     end, {total = #packages_fetch,
           comax = (option.get("verbose") or option.get("diagnosis")) and 1 or 4,
           isolate = true})
+end
+
+-- should install package?
+function _should_install_package(instance)
+    _g.package_status_cache = _g.package_status_cache or {}
+    local result = _g.package_status_cache[tostring(instance)]
+    if result == nil then
+        result = package.should_install(instance) or false
+        _g.package_status_cache[tostring(instance)] = result
+    end
+    return result
 end
 
 -- install packages
@@ -393,7 +404,7 @@ function _install_packages(packages_install, packages_download, installdeps)
                 local dep_not_found = nil
                 for _, dep in pairs(installdeps[tostring(pkg)]) do
                     local installed = packages_installed[tostring(dep)]
-                    if installed == false or (installed == nil and not dep:exists() and not dep:is_optional()) then
+                    if installed == false or (installed == nil and _should_install_package(dep) and not dep:is_optional()) then
                         ready = false
                         dep_not_found = dep
                         break
@@ -426,7 +437,7 @@ function _install_packages(packages_install, packages_download, installdeps)
                 end
             end
             if instance == nil and #packages_pending > 0 then
-                scheduler.co_yield()
+                os.sleep(100)
             end
         end
         if instance then
@@ -444,7 +455,7 @@ function _install_packages(packages_install, packages_download, installdeps)
                 end
                 if not parallelize then
                     while installing_count > 0 do
-                        scheduler.co_yield()
+                        os.sleep(100)
                     end
                 end
                 installing_count = installing_count + 1
@@ -473,6 +484,9 @@ function _install_packages(packages_install, packages_download, installdeps)
                         action_install(instance)
                     end
                 end
+
+                -- reset package status cache
+                _g.package_status_cache = nil
 
                 -- register it to local cache if it is root required package
                 --
@@ -671,7 +685,7 @@ function main(requires, opt)
     local packages_not_found = {}
     local packages_unknown = {}
     for _, instance in ipairs(packages) do
-        if package.should_install(instance) then
+        if _should_install_package(instance) then
             if instance:is_supported() then
                 if #instance:urls() > 0 then
                     packages_download[tostring(instance)] = instance
@@ -693,9 +707,8 @@ function main(requires, opt)
         end
     end
 
-    local has_errors = false
-
     -- exists unknown packages?
+    local has_errors = false
     if #packages_unknown > 0 then
         cprint("${bright color.warning}note: ${clear}the following packages were not found in any repository (check if they are spelled correctly):")
         for _, instance in ipairs(packages_unknown) do
