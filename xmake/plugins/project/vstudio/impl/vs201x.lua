@@ -317,6 +317,11 @@ function _make_targetinfo(mode, arch, target, vcxprojdir)
 
     -- save execution dir (when executed from VS)
     targetinfo.rundir = target:rundir()
+    
+    local runargs = target:get("runargs")
+    if runargs then
+        targetinfo.runargs = os.args(table.wrap(runargs))
+    end
 
     -- save runenvs
     local runenvs = {}

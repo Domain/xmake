@@ -341,6 +341,9 @@ function _make_configurations(vcxprojfile, vsinfo, target)
     for _, targetinfo in ipairs(target.info) do
         vcxprojfile:enter("<PropertyGroup Condition=\"\'%$(Configuration)|%$(Platform)\'==\'%s|%s\'\" Label=\"Debugger\">", targetinfo.mode, targetinfo.arch)
             vcxprojfile:print("<LocalDebuggerWorkingDirectory>%s</LocalDebuggerWorkingDirectory>", _make_dirs(targetinfo.rundir, target.project_dir))
+            if targetinfo.runargs then
+                vcxprojfile:print("<LocalDebuggerCommandArguments>%s</LocalDebuggerCommandArguments>", targetinfo.runargs)
+            end
             -- @note we use writef to avoid escape $() in runenvs, e.g. $([System.Environment]::Get ..)
             vcxprojfile:writef("<LocalDebuggerEnvironment>%s;%%(LocalDebuggerEnvironment)</LocalDebuggerEnvironment>\n", targetinfo.runenvs)
         vcxprojfile:leave("</PropertyGroup>")
